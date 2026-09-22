@@ -1,0 +1,86 @@
+[
+  {
+    "id": "gald",
+    "name": "ガルド",
+    "role": "戦士",
+    "trait": "真っ直ぐで、盾より先に体を出す",
+    "portraitPrompt": "Tarot card style character illustration of a sturdy male warrior with short crimson hair and a scar on the cheek, leather armor and a worn kite shield, warm lantern light, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "ciel",
+    "name": "シエル",
+    "role": "弓手",
+    "trait": "言葉は少ないが、遠くの気配は逃さない",
+    "portraitPrompt": "Tarot card style character illustration of a slender archer with silver-blue hair tied back, pale cloak and a longbow, calm eyes, moonlight, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "merwin",
+    "name": "メルヴィン",
+    "role": "魔術師",
+    "trait": "古い呪文を口ずさみ、袋には紙片ばかり",
+    "portraitPrompt": "Tarot card style character illustration of an elderly mage with a long grey beard, violet robe, a wooden staff with paper talismans, curious eyes, candlelight, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "hana",
+    "name": "ハナ",
+    "role": "僧侶",
+    "trait": "笑顔で包帯を巻き、祈りは最後に残す",
+    "portraitPrompt": "Tarot card style character illustration of a young priestess with warm brown hair and a gentle smile, cream-gold vestments, a wooden prayer bead, soft daylight, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "nok",
+    "name": "ノク",
+    "role": "盗賊",
+    "trait": "鍵より先に人の欲を読む",
+    "portraitPrompt": "Tarot card style character illustration of a sly thief with dark green hood, sharp grin, a lockpick behind the ear, night market shadows, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "luca",
+    "name": "ルカ",
+    "role": "狩人",
+    "trait": "獣の足跡を詩のように辿る",
+    "portraitPrompt": "Tarot card style character illustration of a forest hunter with wind-blown auburn hair, fur-lined cloak, a hawk on the shoulder, mossy woods, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "iris",
+    "name": "イリス",
+    "role": "騎士",
+    "trait": "誓いを守るためなら遠回りをする",
+    "portraitPrompt": "Tarot card style character illustration of a female knight with steel-blue eyes, polished breastplate and a blue sash, solemn face, castle hall light, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "rio",
+    "name": "リオ",
+    "role": "吟遊詩人",
+    "trait": "戦いの最中でも韻を踏む",
+    "portraitPrompt": "Tarot card style character illustration of a traveling bard with sun-browned skin, orange scarf, a lute on the back, laughing eyes, festival lanterns, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "poppy",
+    "name": "ポピー",
+    "role": "錬金術師",
+    "trait": "爆発を失敗ではなくデータと呼ぶ",
+    "portraitPrompt": "Tarot card style character illustration of a young alchemist with messy teal-tinted hair, goggles on the forehead, stained apron and glass flasks, workshop glow, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "zane",
+    "name": "ゼーン",
+    "role": "槍使い",
+    "trait": "竜の血が騒ぐと、先に槍が動く",
+    "portraitPrompt": "Tarot card style character illustration of a tall spear fighter with wine-red hair, a faint scale mark on the neck, long spear, stormy sky, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "kira",
+    "name": "キラ",
+    "role": "踊り子",
+    "trait": "足音で罠を起こし、拍子で閉じる",
+    "portraitPrompt": "Tarot card style character illustration of a dancer with dark coiled hair and gold anklets, a thin veil and a knowing smile, festival dusk, ornate vintage tarot frame, no text"
+  },
+  {
+    "id": "bren",
+    "name": "ブレン",
+    "role": "斧使い",
+    "trait": "扉より壁を選び、道を新しくする",
+    "portraitPrompt": "Tarot card style character illustration of a broad axe fighter with a shaved side and a braided beard, notched two-handed axe, hearth light, ornate vintage tarot frame, no text"
+  }
+]

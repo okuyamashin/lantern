@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Kamishibai adventure jobs on SQS, Lambda, DynamoDB, and S3
+
+Parameters:
+  OpenAIApiKey:
+    Type: String
+    NoEcho: true
+    Description: OpenAI API key. Do not commit this value.
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Architectures:
+      - arm64
+    Timeout: 29
+    MemorySize: 512
+    Environment:
+      Variables:
+        JOBS_TABLE: !Ref JobsTable
+        JOBS_QUEUE_URL: !Ref JobsQueue
+        ADVENTURE_BUCKET: !Ref AdventureBucket
+        ADVENTURE_PUBLIC_BASE: !Sub "https://${AdventureBucket}.s3.${AWS::Region}.amazonaws.com"
+        OPENAI_API_KEY: !Ref OpenAIApiKey
+
+Resources:
+  AdventureBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
+
+  AdventureBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AdventureBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${AdventureBucket.Arn}/adventures/*"
+
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  JobsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 960
+      MessageRetentionPeriod: 86400
+
+  LanternApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - https://lantern.engawa5656.com
+          - http://localhost:5173
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.handler
+      CodeUri: ../dist/aws
+      Events:
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LanternApi
+            Path: /{proxy+}
+            Method: ANY
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt JobsQueue.QueueName
+        - S3ReadPolicy:
+            BucketName: !Ref AdventureBucket
+
+  WorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: worker.handler
+      CodeUri: ../dist/aws
+      Timeout: 900
+      MemorySize: 1024
+      ReservedConcurrentExecutions: 2
+      Events:
+        Job:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt JobsQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+        - S3CrudPolicy:
+            BucketName: !Ref AdventureBucket
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${LanternApi}.execute-api.${AWS::Region}.amazonaws.com"
+  BucketName:
+    Value: !Ref AdventureBucket
+  QueueUrl:
+    Value: !Ref JobsQueue
+  TableName:
+    Value: !Ref JobsTable

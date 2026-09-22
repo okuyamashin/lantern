@@ -1,0 +1,126 @@
+{
+  "places": [
+    {
+      "id": "mist-mine",
+      "name": "霧の廃坑",
+      "blurb": "灯が届かない坑道。水滴と古い鎚の音だけが残る",
+      "imageHint": "fog-choked abandoned mine tunnels, rotting timber supports, wet stone, lantern haze"
+    },
+    {
+      "id": "moon-marsh",
+      "name": "月灯りの湿地",
+      "blurb": "月を映した水たまりが、踏み跡をすぐに消す",
+      "imageHint": "moonlit wetland, reed islands, pale reflections, sinking boardwalks"
+    },
+    {
+      "id": "rust-gate",
+      "name": "赤錆の城門",
+      "blurb": "門は閉じたまま、錆だけが年を重ねている",
+      "imageHint": "colossal rusted castle gate, flaking iron, crow-perched battlements, dusk"
+    },
+    {
+      "id": "salt-lighthouse",
+      "name": "塩の灯台",
+      "blurb": "潮風がガラスを白くし、光は海より陸を探す",
+      "imageHint": "weathered salt-crusted lighthouse on black rocks, storm spray, pale beacon"
+    },
+    {
+      "id": "old-shrine",
+      "name": "古木の祠",
+      "blurb": "根が石段を飲み、祈りの札は樹皮に癒着している",
+      "imageHint": "shrine swallowed by an ancient tree, mossy stone steps, paper talismans on bark"
+    },
+    {
+      "id": "sand-colonnade",
+      "name": "砂の回廊",
+      "blurb": "列柱の影が長く、足跡は次の風で王のものになる",
+      "imageHint": "desert colonnade half-buried in sand, long shadows, cracked statues"
+    },
+    {
+      "id": "ice-ferry",
+      "name": "氷の渡し",
+      "blurb": "川は止まったが、対岸の綱はまだ揺れている",
+      "imageHint": "frozen river ferry crossing, ice-locked barge, rope bridge rime, pale winter light"
+    },
+    {
+      "id": "market-well",
+      "name": "市場裏の井戸",
+      "blurb": "夜店の裏で、願いより先にコインが沈む",
+      "imageHint": "night market back alley, old stone well, hanging lanterns, wet cobbles"
+    },
+    {
+      "id": "wind-pass",
+      "name": "風鳴りの峠",
+      "blurb": "祈りの旗が裂け、声に似た風だけが残る",
+      "imageHint": "high mountain pass, torn prayer flags, wind-carved rocks, thin clouds"
+    },
+    {
+      "id": "starfall-lake",
+      "name": "星落ちの湖",
+      "blurb": "落ちた星の破片が、岸の砂をまだ熱くしている",
+      "imageHint": "still alpine lake at night, fallen-star shards on the shore, faint aurora"
+    }
+  ],
+  "enemies": [
+    {
+      "id": "bone-miner",
+      "name": "骨の坑夫王",
+      "blurb": "鎚を忘れず、鉱脈の代わりに命を掘る",
+      "imageHint": "skeletal miner king in tattered work leathers, crowned with ore, rusted pickaxe"
+    },
+    {
+      "id": "lamp-frog",
+      "name": "灯を食う蛙",
+      "blurb": "光を飲み、残った闇を産卵する",
+      "imageHint": "huge marsh frog with lantern-glow in its throat, swallowing light, wet hide"
+    },
+    {
+      "id": "rust-warden",
+      "name": "錆びた番人",
+      "blurb": "鍵を失ったあとも、誰も通さないと誓い続けている",
+      "imageHint": "hollow rusted armor warden fused to a great key, iron flakes, empty helm"
+    },
+    {
+      "id": "tide-keeper",
+      "name": "潮の灯台守",
+      "blurb": "亡き光を追い、船より先に人を招く",
+      "imageHint": "drowned lighthouse keeper draped in kelp and salt, lantern of seawater"
+    },
+    {
+      "id": "root-beast",
+      "name": "根に棲む獣",
+      "blurb": "祠を守るのではなく、祈る者を養分にする",
+      "imageHint": "beast of tangled roots and antlers, soil-crusted fur, shrine moss"
+    },
+    {
+      "id": "dry-king",
+      "name": "乾いた王の影",
+      "blurb": "王冠は砂、声は風。従う兵は自分の足跡だけ",
+      "imageHint": "withered desert king of dust and gold foil, hollow eyes, swirling sand cloak"
+    },
+    {
+      "id": "white-wolf",
+      "name": "白い渡し狼",
+      "blurb": "渡し賃の代わりに、温かいものを求める",
+      "imageHint": "enormous white wolf with frost-matted fur, ferry rope in its teeth, ice breath"
+    },
+    {
+      "id": "wish-serpent",
+      "name": "欲を飲む蛇",
+      "blurb": "井戸の底で、叶わぬ願いだけを太らせる",
+      "imageHint": "long well-serpent with coin-scale skin, eyes like sunk copper, coiled in dark water"
+    },
+    {
+      "id": "wind-wraith",
+      "name": "峠の風骸",
+      "blurb": "旗の裂ける音で歩き、名前を風に還す",
+      "imageHint": "wind wraith of torn prayer flags and pale bone, howling pass, tattered sleeves"
+    },
+    {
+      "id": "star-eater",
+      "name": "星喰い",
+      "blurb": "落ちた光を集め、湖より先に空を暗くする",
+      "imageHint": "lank celestial eater with a cracked star in its maw, lake-black hide, faint sparks"
+    }
+  ]
+}

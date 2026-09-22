@@ -1,0 +1,359 @@
+:root {
+  color: #efe4c8;
+  background: #1b140f;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  line-height: 1.7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, #3a2a1c 0%, transparent 45%),
+    #1b140f;
+}
+
+.frame {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.masthead,
+.panel,
+.caption,
+.result {
+  text-align: center;
+}
+
+.eyebrow,
+.role,
+.count {
+  margin: 0;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  color: #d4a574;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Zen Old Mincho", serif;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 8px 0 0;
+  font-size: clamp(32px, 5vw, 54px);
+}
+
+.lead,
+.hint,
+.trait,
+.party-line,
+.subtitle,
+.status {
+  color: #d8c8a6;
+}
+
+.lead {
+  max-width: 36em;
+  margin: 24px auto;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid #d4a574;
+  background: transparent;
+  color: #efe4c8;
+  padding: 10px 22px;
+  font: inherit;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #8b3a2a;
+  border-color: #c45c4a;
+}
+
+button.ghost {
+  background: #2c2118;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+.sub {
+  margin: 36px 0 16px;
+  font-size: 20px;
+}
+
+.roster,
+.party {
+  display: grid;
+  gap: 16px;
+}
+
+.roster {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.party {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.card {
+  background: #261b14;
+  border: 1px solid #6b5138;
+  overflow: hidden;
+  text-align: left;
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: #3a2a1c;
+}
+
+.card .meta {
+  padding: 12px 14px 16px;
+}
+
+.card h3 {
+  margin: 2px 0 8px;
+  font-size: 22px;
+}
+
+.card .trait {
+  margin: 0;
+  font-size: 13px;
+}
+
+.card .look {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #b8a888;
+  word-break: break-word;
+}
+
+.card.is-chosen {
+  border-color: #e2c48a;
+  box-shadow: 0 0 0 1px #e2c48a inset;
+}
+
+.generating {
+  min-height: 40vh;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+}
+
+.status {
+  font-family: "Zen Old Mincho", serif;
+  font-size: 28px;
+}
+
+.error {
+  color: #f0a090;
+}
+
+.stage {
+  cursor: pointer;
+}
+
+.scene-art {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #120d0a;
+  border: 1px solid #6b5138;
+}
+
+.caption {
+  margin-top: 16px;
+  padding: 8px 8px 0;
+}
+
+.subtitle {
+  margin: 8px auto;
+  max-width: 42em;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+.caption .line {
+  font-family: "Zen Old Mincho", serif;
+  font-size: clamp(18px, 2.4vw, 26px);
+  margin: 8px auto 4px;
+  max-width: 42em;
+}
+
+.result h2 {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 12px 0;
+}
+
+.board {
+  --rot: 0deg;
+  --shift-x: 0px;
+  --shift-y: 0px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px 6px;
+  min-height: 380px;
+  margin: 0 auto 8px;
+  padding: 36px 18px 52px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(28, 14, 8, 0.18), rgba(16, 8, 4, 0.38)),
+    repeating-linear-gradient(
+      90deg,
+      #6d4426 0 44px,
+      #5a361c 44px 47px,
+      #7a4d2b 47px 92px,
+      #4f3018 92px 96px
+    );
+  border: 10px solid #3a2414;
+  box-shadow:
+    inset 0 0 48px rgba(0, 0, 0, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.memo {
+  position: relative;
+  width: min(210px, 44vw);
+  padding: 22px 14px 14px;
+  text-align: left;
+  color: #3b2a18;
+  background: #f3e2b4;
+  font-family: "Klee One", "Zen Kaku Gothic New", sans-serif;
+  letter-spacing: 0.02em;
+  box-shadow: 2px 5px 12px rgba(18, 8, 4, 0.38);
+  transform: translate(var(--shift-x), var(--shift-y)) rotate(var(--rot));
+  cursor: pointer;
+}
+
+.memo[data-paper="1"] {
+  background: #f7edd0;
+}
+
+.memo[data-paper="2"] {
+  background: #ead6a8;
+}
+
+.memo[data-paper="3"] {
+  background: #f0d3a6;
+}
+
+.memo-pin {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 32% 28%, #f4d2c8, #b4332a 58%, #5c1210);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.memo[data-pin="1"] .memo-pin {
+  background: radial-gradient(circle at 32% 28%, #f3e6b0, #b8862a 58%, #5a3a10);
+}
+
+.memo[data-pin="2"] .memo-pin {
+  background: radial-gradient(circle at 32% 28%, #d8e4f0, #4a6a88 58%, #1c3044);
+}
+
+.memo-tape {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  width: 36px;
+  height: 16px;
+  background: rgba(246, 228, 150, 0.45);
+  transform: rotate(8deg);
+}
+
+.memo-sketch,
+.memo-sketch.is-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  margin: 0 0 8px;
+  background: #e7d4a4;
+  border: 1px dashed #8b6a3c;
+}
+
+.memo-stamp {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: #8b3a2a;
+}
+
+.memo h3 {
+  margin: 2px 0 8px;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.memo-line,
+.memo-date {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #5a4024;
+}
+
+.memo-date {
+  margin-top: 8px;
+  opacity: 0.78;
+}
+
+.memo-deco {
+  width: min(156px, 36vw);
+  opacity: 0.7;
+  cursor: default;
+}
+
+.memo:hover:not(.memo-deco) {
+  filter: brightness(1.04);
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .board {
+    padding: 28px 8px 40px;
+    gap: 8px 0;
+  }
+
+  .memo {
+    width: min(168px, 46vw);
+  }
+}
