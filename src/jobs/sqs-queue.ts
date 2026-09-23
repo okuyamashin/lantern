@@ -8,7 +8,12 @@ export function createSqsQueue(queueUrl: string, region: string): JobQueue {
       await client.send(
         new SendMessageCommand({
           QueueUrl: queueUrl,
-          MessageBody: JSON.stringify({ jobId: job.id, cardIds: job.cardIds }),
+          MessageBody: JSON.stringify({
+            jobId: job.id,
+            kind: job.kind,
+            cardIds: job.cardIds,
+            adventureIds: job.adventureIds ?? [],
+          }),
         }),
       );
     },

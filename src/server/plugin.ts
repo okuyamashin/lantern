@@ -3,12 +3,16 @@ import { extname, join, normalize, sep } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { loadCards } from "../generate/cards.ts";
+import { emailFromToken, isGuildEmail } from "../guild.ts";
 import { createRuntime } from "../jobs/runtime.ts";
 
 const MIME: Record<string, string> = {
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
   ".json": "application/json",
   ".svg": "image/svg+xml",
+  ".mp3": "audio/mpeg",
 };
 
 export function adventurePlugin(root: string): Plugin {
@@ -43,7 +47,30 @@ async function route(
       return;
     }
 
+    if (req.method === "POST" && url === "/api/jobs/narrate") {
+      if (!allowGuildJob(req)) {
+        json(res, 403, { message: "ギルドの鍵が必要です。" });
+        return;
+      }
+      const body = await readJson<{ ids?: string[] }>(req);
+      const started = await jobs.startNarrateJobs(body.ids);
+      json(res, 202, {
+        count: started.length,
+        jobs: started.map((job) => ({
+          id: job.id,
+          status: job.status,
+          message: job.message,
+          adventureIds: job.adventureIds,
+        })),
+      });
+      return;
+    }
+
     if (req.method === "POST" && url === "/api/jobs") {
+      if (!allowGuildJob(req)) {
+        json(res, 403, { message: "ギルドの鍵が必要です。" });
+        return;
+      }
       const body = await readJson<{ cardIds?: string[] }>(req);
       const job = await jobs.startJob(body.cardIds ?? []);
       json(res, 202, { id: job.id, status: job.status, message: job.message });
@@ -102,6 +129,15 @@ function serveOutput(root: string, url: string, res: ServerResponse): void {
     "Content-Type": MIME[extname(file)] ?? "application/octet-stream",
   });
   createReadStream(file).pipe(res);
+}
+
+function allowGuildJob(req: IncomingMessage): boolean {
+  if (process.env.VITE_COGNITO_CLIENT_ID || process.env.COGNITO_USER_POOL_ID) {
+    const header = String(req.headers.authorization ?? "");
+    const token = header.replace(/^Bearer\s+/i, "");
+    return Boolean(token && isGuildEmail(emailFromToken(token)));
+  }
+  return process.env.NODE_ENV !== "production";
 }
 
 function json(res: ServerResponse, status: number, body: unknown): void {

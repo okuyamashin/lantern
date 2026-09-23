@@ -16,6 +16,11 @@ fi
 
 npm run build:aws
 
+set -- --parameter-overrides "OpenAIApiKey=${OPENAI_API_KEY}"
+if [ -n "${GOOGLE_CLIENT_ID:-}" ] && [ -n "${GOOGLE_CLIENT_SECRET:-}" ]; then
+  set -- "$@" "GoogleClientId=${GOOGLE_CLIENT_ID}" "GoogleClientSecret=${GOOGLE_CLIENT_SECRET}"
+fi
+
 sam deploy \
   --template-file infra/template.yaml \
   --stack-name lantern-api \
@@ -24,7 +29,7 @@ sam deploy \
   --resolve-s3 \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset \
-  --parameter-overrides "OpenAIApiKey=${OPENAI_API_KEY}"
+  "$@"
 
 aws cloudformation describe-stacks \
   --region ap-northeast-1 \

@@ -18,7 +18,9 @@ export function toAdventureSummary(adventure: Adventure): AdventureSummary {
         .filter(Boolean)
         .join(" / "),
     partyNames: adventure.party.map((card) => card.name),
-    coverPath: enemy ? `/enemies/${enemy.id}.png` : (adventure.scenes[0]?.imagePath ?? ""),
+    coverPath:
+      adventure.enemy?.imagePath ||
+      (enemy ? `/enemies/${enemy.id}.jpg` : (adventure.scenes[0]?.imagePath ?? "")),
     sceneCount: adventure.scenes.length,
     enemyId: enemy?.id,
     enemyName: enemy?.name,

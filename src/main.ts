@@ -1,5 +1,7 @@
 import records from "../data/adventurers.json";
 import world from "../data/world.json";
+import { authEnabled, authHeaders, canDraw, currentSession, login, logout, restoreSession } from "./auth.ts";
+import { isGuildEmail } from "./guild.ts";
 import type { Job } from "./jobs/types.ts";
 import type { Adventure, AdventureSummary, Adventurer } from "./types.ts";
 import "./style.css";
@@ -12,6 +14,25 @@ if (!root) {
 }
 const app = root;
 const apiBase = String(import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+type BgmTrack = "guild-board" | "before-the-road" | "lantern-road";
+
+const bgm = new Audio("/bgm/guild-board.mp3");
+bgm.loop = true;
+bgm.preload = "auto";
+bgm.volume = 0.28;
+bgm.dataset.bgm = "guild-board";
+document.body.append(bgm);
+const voice = new Audio();
+voice.preload = "auto";
+voice.dataset.voice = "narration";
+document.body.append(voice);
+voice.addEventListener("ended", () => {
+  if (state.screen !== "play") {
+    bgm.volume = 0.28;
+    return;
+  }
+  nextScene();
+});
 
 function api(path: string): string {
   return `${apiBase}${path}`;
@@ -27,6 +48,8 @@ const state = {
   adventure: null as Adventure | null,
   page: 0,
   poll: 0,
+  turning: false,
+  bgmMuted: false,
 };
 
 init().catch((error) => {
@@ -35,6 +58,11 @@ init().catch((error) => {
 });
 
 async function init(): Promise<void> {
+  try {
+    await restoreSession();
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : "ログインに失敗しました";
+  }
   state.cards = localCards();
   const remoteCards = await readApiJson<Adventurer[]>(api("/api/adventurers"));
   if (remoteCards?.length) {
@@ -42,12 +70,13 @@ async function init(): Promise<void> {
   }
   state.archive = (await readApiJson<AdventureSummary[]>(api("/api/adventures"))) ?? [];
   render();
+  useBgm("guild-board");
 }
 
 function localCards(): Adventurer[] {
   return records.map((card) => ({
     ...card,
-    portrait: `/cards/${card.id}.png`,
+    portrait: `/cards/${card.id}.jpg`,
   }));
 }
 
@@ -68,6 +97,8 @@ function render(): void {
   app.innerHTML = `
     <div class="frame">
       <header class="masthead">
+        ${cornerButton()}
+        <div class="auth-bar">${authBar()}</div>
         <p class="eyebrow">紙芝居</p>
         <h1>灯りの四人</h1>
       </header>
@@ -93,13 +124,15 @@ function view(): string {
     const total = state.adventure.scenes.length;
     return `
       <section class="stage" data-action="next-scene">
-        <img class="scene-art" src="${scene.imagePath}" alt="" />
+        <div class="stage-frame">
+          <img class="scene-art is-back" src="${escapeHtml(scene.imagePath)}" alt="" />
+          <img class="scene-art is-front" src="${escapeHtml(scene.imagePath)}" alt="" />
+        </div>
         <div class="caption">
           <p class="count">${state.page + 1} / ${total}</p>
           <p class="subtitle">${escapeHtml(adventureSubtitle(state.adventure))}</p>
           <p class="line">${escapeHtml(scene.caption)}</p>
-          <p class="hint">クリックで次へ</p>
-          <button type="button" class="ghost" data-action="home">一覧へ</button>
+          <p class="hint">読み終わると次へ</p>
         </div>
       </section>
     `;
@@ -123,11 +156,15 @@ function view(): string {
 
   return `
     <section class="panel">
-      <p class="lead">十二人の冒険者から四人を引き、場所と敵を決めて紙芝居を作ります。旅の結末は成功です。</p>
+      <p class="lead">${escapeHtml(rosterLead())}</p>
       <div class="actions">
-        <button type="button" class="primary" data-action="draw">四人を引く</button>
         ${
-          state.party.length === 4
+          canDraw()
+            ? `<button type="button" class="primary" data-action="draw">四人を引く</button>`
+            : ""
+        }
+        ${
+          canDraw() && state.party.length === 4
             ? `<button type="button" class="ghost" data-action="start">出発する</button>`
             : ""
         }
@@ -140,9 +177,42 @@ function view(): string {
           : ""
       }
       ${archiveView()}
-      <h2 class="sub">控えの十二人</h2>
+      <h2 class="sub">冒険者たち</h2>
       <div class="roster">${state.cards.map((card) => cardView(card, false)).join("")}</div>
     </section>
+  `;
+}
+
+function cornerButton(): string {
+  if (state.screen === "play") {
+    return `<button type="button" class="ghost home-button" data-action="home">一覧へ</button>`;
+  }
+  if (state.screen === "roster" || state.screen === "generating") {
+    const label = state.bgmMuted ? "音楽を戻す" : "音楽を止める";
+    return `<button type="button" class="ghost home-button" data-action="bgm">${label}</button>`;
+  }
+  return "";
+}
+
+function rosterLead(): string {
+  if (canDraw()) {
+    return "十二人の冒険者から四人を引き、場所と敵を決めて紙芝居を作ります。旅の結末は成功です。";
+  }
+  return "夜のギルドに、四人の旅が紙芝居で貼ってあります。絵と語りだけで進み、勝ち戻った話だけが壁に残ります。";
+}
+
+function authBar(): string {
+  if (!authEnabled()) {
+    return "";
+  }
+  const session = currentSession();
+  if (!session) {
+    return `<button type="button" class="ghost auth-button" data-action="login">Googleで入る</button>`;
+  }
+  const label = isGuildEmail(session.email) ? session.email : "閲覧のみ";
+  return `
+    <span class="auth-who">${escapeHtml(label)}</span>
+    <button type="button" class="ghost auth-button" data-action="logout">出る</button>
   `;
 }
 
@@ -204,12 +274,15 @@ function decoMemos(): string {
 }
 
 function memoSketch(item: AdventureSummary): string {
+  if (item.coverPath.startsWith("https://")) {
+    return item.coverPath;
+  }
   if (item.enemyId) {
-    return `/enemies/${item.enemyId}.png`;
+    return `/enemies/${item.enemyId}.jpg`;
   }
   const enemy = world.enemies.find((entry) => entry.name === memoEnemyName(item));
   if (enemy) {
-    return `/enemies/${enemy.id}.png`;
+    return `/enemies/${enemy.id}.jpg`;
   }
   return item.coverPath;
 }
@@ -249,7 +322,6 @@ function cardView(card: Adventurer, selected: boolean): string {
         <p class="role">${escapeHtml(card.role)}</p>
         <h3>${escapeHtml(card.name)}</h3>
         <p class="trait">${escapeHtml(card.trait)}</p>
-        <p class="look">${escapeHtml(card.portraitPrompt)}</p>
       </div>
     </article>
   `;
@@ -262,20 +334,42 @@ function bind(): void {
       if (action !== "next-scene") {
         event.stopPropagation();
       }
-      if (action === "draw") {
+      if (action === "bgm") {
+        toggleBgm();
+      } else if (action === "login") {
+        useBgm("guild-board");
+        void login();
+      } else if (action === "logout") {
+        logout();
+      } else if (action === "draw") {
+        if (!canDraw()) {
+          return;
+        }
+        useBgm("guild-board");
         drawParty();
       } else if (action === "start") {
+        if (!canDraw()) {
+          return;
+        }
+        useBgm("before-the-road");
         void startAdventure();
       } else if (action === "next-scene") {
+        useBgm("lantern-road");
         nextScene();
       } else if (action === "replay") {
+        useBgm("lantern-road");
+        state.turning = false;
         state.page = 0;
         state.screen = "play";
         render();
+        playNarration();
       } else if (action === "home") {
+        stopNarration();
+        useBgm("guild-board");
         void goHome();
       } else if (action === "open") {
         event.stopPropagation();
+        useBgm("lantern-road");
         void openAdventure(node.dataset.id ?? "");
       }
     });
@@ -302,7 +396,7 @@ async function startAdventure(): Promise<void> {
   try {
     const created = await readApiJson<{ id: string }>(api("/api/jobs"), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({ cardIds: state.party.map((card) => card.id) }),
     });
     if (!created?.id) {
@@ -324,6 +418,8 @@ async function startAdventure(): Promise<void> {
         state.screen = "play";
         await refreshArchive();
         render();
+        useBgm("lantern-road");
+        playNarration();
         return;
       }
       if (job.status === "error") {
@@ -337,8 +433,75 @@ async function startAdventure(): Promise<void> {
     }
     state.error = error instanceof Error ? error.message : "生成に失敗しました。";
     state.screen = "roster";
+    stopNarration();
+    useBgm("guild-board");
     render();
   }
+}
+
+function useBgm(track: BgmTrack): void {
+  if (bgm.dataset.bgm !== track) {
+    bgm.pause();
+    bgm.src = `/bgm/${track}.mp3`;
+    bgm.dataset.bgm = track;
+    bgm.currentTime = 0;
+    bgm.volume = 0.28;
+  }
+  if (state.bgmMuted && track !== "lantern-road") {
+    bgm.pause();
+    return;
+  }
+  if (bgm.paused) {
+    void bgm.play().catch(() => undefined);
+  }
+}
+
+function toggleBgm(): void {
+  state.bgmMuted = !state.bgmMuted;
+  if (state.bgmMuted) {
+    bgm.pause();
+  } else if (state.screen === "generating") {
+    useBgm("before-the-road");
+  } else {
+    useBgm("guild-board");
+  }
+  render();
+}
+
+function stopBgm(): void {
+  bgm.pause();
+  bgm.currentTime = 0;
+  bgm.volume = 0.28;
+}
+
+function playNarration(): void {
+  const src = state.adventure?.scenes[state.page]?.audioPath;
+  voice.pause();
+  preloadNextScene();
+  if (!src) {
+    bgm.volume = 0.28;
+    voice.removeAttribute("src");
+    return;
+  }
+  bgm.volume = 0.12;
+  voice.src = src;
+  void voice.play().catch(() => undefined);
+}
+
+function preloadNextScene(): void {
+  const next = state.adventure?.scenes[state.page + 1];
+  if (!next?.imagePath) {
+    return;
+  }
+  const image = new Image();
+  image.src = next.imagePath;
+  void image.decode().catch(() => undefined);
+}
+
+function stopNarration(): void {
+  voice.pause();
+  voice.removeAttribute("src");
+  bgm.volume = 0.28;
 }
 
 function wait(ms: number): Promise<void> {
@@ -356,6 +519,7 @@ async function refreshArchive(): Promise<void> {
 
 async function goHome(): Promise<void> {
   state.poll += 1;
+  state.turning = false;
   state.screen = "roster";
   state.adventure = null;
   state.page = 0;
@@ -378,9 +542,11 @@ async function openAdventure(id: string): Promise<void> {
   }
   state.adventure = adventure;
   state.page = 0;
+  state.turning = false;
   state.error = "";
   state.screen = "play";
   render();
+  playNarration();
 }
 
 function adventureSubtitle(adventure: Adventure): string {
@@ -404,17 +570,86 @@ function formatWhen(value: string): string {
   return date.toLocaleString("ja-JP");
 }
 
-function nextScene(): void {
-  if (!state.adventure) {
+async function nextScene(): Promise<void> {
+  if (!state.adventure || state.turning) {
     return;
   }
-  if (state.page < state.adventure.scenes.length - 1) {
-    state.page += 1;
+  if (state.page >= state.adventure.scenes.length - 1) {
+    stopNarration();
+    stopBgm();
+    state.screen = "result";
     render();
     return;
   }
-  state.screen = "result";
-  render();
+
+  const next = state.adventure.scenes[state.page + 1];
+  const front = app.querySelector<HTMLImageElement>(".scene-art.is-front");
+  const back = app.querySelector<HTMLImageElement>(".scene-art.is-back");
+  if (!next || !front || !back) {
+    state.page += 1;
+    render();
+    playNarration();
+    return;
+  }
+
+  state.turning = true;
+  stopNarration();
+  back.src = next.imagePath;
+  await back.decode().catch(() => undefined);
+  if (!state.adventure || state.screen !== "play") {
+    state.turning = false;
+    return;
+  }
+
+  let finished = false;
+  const animation = front.animate(
+    [
+      { transform: "translateX(0)", boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)" },
+      { transform: "translateX(104%)", boxShadow: "-18px 0 22px rgba(0, 0, 0, 0.5)" },
+    ],
+    {
+      duration: 720,
+      easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+      fill: "forwards",
+    },
+  );
+
+  const finish = () => {
+    if (finished || !state.adventure) {
+      return;
+    }
+    finished = true;
+    window.clearTimeout(timer);
+    animation.cancel();
+    state.page += 1;
+    front.src = next.imagePath;
+    front.style.transform = "";
+    updatePlayCaption();
+    playNarration();
+    state.turning = false;
+  };
+
+  animation.addEventListener("finish", finish);
+  const timer = window.setTimeout(finish, 850);
+}
+
+function updatePlayCaption(): void {
+  if (!state.adventure) {
+    return;
+  }
+  const scene = state.adventure.scenes[state.page];
+  const count = app.querySelector(".caption .count");
+  const line = app.querySelector(".caption .line");
+  const subtitle = app.querySelector(".caption .subtitle");
+  if (count) {
+    count.textContent = `${state.page + 1} / ${state.adventure.scenes.length}`;
+  }
+  if (line && scene) {
+    line.textContent = scene.caption;
+  }
+  if (subtitle) {
+    subtitle.textContent = adventureSubtitle(state.adventure);
+  }
 }
 
 function escapeHtml(value: string): string {

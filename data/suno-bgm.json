@@ -1,0 +1,58 @@
+[
+  {
+    "id": "guild-board",
+    "title": "Guild Board",
+    "use": "控えの十二人とギルド掲示板",
+    "style": "warm ambient game BGM, Japanese folk, soft koto, distant shamisen, wood flute, lantern glow, quiet tavern night, looping soundtrack, instrumental only, no vocals",
+    "prompt": "A looping instrumental BGM for a guild notice board at night. Warm, small, and still. Paper rustle and lantern air, not a song. No melody that asks to be hummed.",
+    "exclude": "vocals, singer, choir, humming, speech, rap, lyrics, pop drop, EDM, drums"
+  },
+  {
+    "id": "before-the-road",
+    "title": "Before the Road",
+    "use": "冒険を生成している待ち時間",
+    "style": "quiet Japanese ambient, distant koto, soft wood percussion like trimming a lamp wick, ink and paper, still night room, no walking pulse, looping soundtrack, instrumental only, no vocals",
+    "prompt": "A looping instrumental while a kamishibai is being prepared. Not traveling yet. Warm hush, ink drying, a lantern being trimmed. No melody that wants to be hummed.",
+    "exclude": "vocals, singer, choir, humming, speech, lyrics, walking beat, taiko, drums, brass, battle, EDM"
+  },
+  {
+    "id": "lantern-road",
+    "title": "Lantern Road",
+    "use": "紙芝居の既定の旅",
+    "style": "cinematic folk ambient, walking pace, soft taiko far away, strings, night road, warm minor key, looping RPG travel theme, instrumental only, no vocals",
+    "prompt": "A looping instrumental travel theme under kamishibai narration. Gentle forward motion, never heroic, never sad enough to steal the voiceover.",
+    "exclude": "vocals, singer, choir, humming, speech, lyrics, battle stinger, brass fanfare"
+  },
+  {
+    "id": "old-shrine",
+    "title": "Old Shrine",
+    "use": "古木の祠、霧、根",
+    "style": "Japanese shrine ambient, shakuhachi, sparse koto, temple bells far away, moss, night insects, looping spiritual BGM, instrumental only, no vocals",
+    "prompt": "A looping instrumental for an old tree shrine. Damp wood, paper talismans, incense almost gone. Keep space between notes.",
+    "exclude": "vocals, singer, choir, sutra chant, humming, speech, lyrics, taiko climax"
+  },
+  {
+    "id": "salt-beacon",
+    "title": "Salt Beacon",
+    "use": "塩の灯台、海、渡し",
+    "style": "dark coastal ambient, low cello, wind, distant foghorn color, slow waves, salt, looping lighthouse BGM, instrumental only, no vocals",
+    "prompt": "A looping instrumental for a salt-crusted lighthouse. Cold spray, a pale rotating light, no sea shanty.",
+    "exclude": "vocals, singer, choir, humming, speech, lyrics, pirate jig, accordion song"
+  },
+  {
+    "id": "dry-shadow",
+    "title": "Dry Shadow",
+    "use": "砂の回廊、廃門、乾いた王",
+    "style": "desert ruin ambient, dry percussion far away, low drone, oud color, sand wind, looping ancient BGM, instrumental only, no vocals",
+    "prompt": "A looping instrumental for a buried colonnade. Heat, dust, a crown made of sand. Quiet threat, not an action cue.",
+    "exclude": "vocals, singer, choir, humming, speech, lyrics, belly dance pop, big drums"
+  },
+  {
+    "id": "star-water",
+    "title": "Star Water",
+    "use": "星落ちの湖、月の湿地",
+    "style": "night lake ambient, glass tones, soft piano, aurora pad, still water, looping wonder BGM, instrumental only, no vocals",
+    "prompt": "A looping instrumental for a lake that caught a fallen star. Cold light on water. Hold the hush.",
+    "exclude": "vocals, singer, choir, humming, speech, lyrics, new-age vocalize, harp gliss spam"
+  }
+]

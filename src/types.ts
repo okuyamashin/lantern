@@ -12,6 +12,7 @@ export type Enemy = {
   name: string;
   blurb: string;
   imageHint: string;
+  imagePath?: string;
 };
 
 export type Adventurer = {
@@ -36,6 +37,7 @@ export type StoryDraft = {
 
 export type AdventureScene = StoryScene & {
   imagePath: string;
+  audioPath?: string;
 };
 
 export type Adventure = {

@@ -1,5 +1,6 @@
 import type { Adventurer, Enemy, Place, StoryDraft } from "../types.ts";
 import { getOpenAI } from "./openai.ts";
+import type OpenAI from "openai";
 
 const SYSTEM = `あなたは日本語の紙芝居作家です。
 与えられた4人の冒険者と、指定された場所・敵だけで、短いAVG風の冒険を書いてください。
@@ -35,24 +36,20 @@ export async function writeStory(
     .map((card) => `- ${card.name}（${card.role}）: ${card.trait}`)
     .join("\n");
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    response_format: { type: "json_object" },
-    temperature: 0.95,
-    messages: [
-      { role: "system", content: SYSTEM },
-      {
-        role: "user",
-        content: [
-          "この4人の旅を、必ず成功で書いてください。",
-          roster,
-          "",
-          `場所: ${place.name} — ${place.blurb}`,
-          `敵: ${enemy.name} — ${enemy.blurb}`,
-        ].join("\n"),
-      },
-    ],
-  });
+  const messages = [
+    { role: "system" as const, content: SYSTEM },
+    {
+      role: "user" as const,
+      content: [
+        "この4人の旅を、必ず成功で書いてください。",
+        roster,
+        "",
+        `場所: ${place.name} — ${place.blurb}`,
+        `敵: ${enemy.name} — ${enemy.blurb}`,
+      ].join("\n"),
+    },
+  ];
+  const completion = await createStory(openai, messages);
 
   const text = completion.choices[0]?.message?.content;
   if (!text) {
@@ -61,6 +58,29 @@ export async function writeStory(
 
   const draft = JSON.parse(text) as StoryDraft;
   return normalizeStory(draft);
+}
+
+async function createStory(
+  openai: OpenAI,
+  messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+) {
+  const request = {
+    model: "gpt-6-astra",
+    response_format: { type: "json_object" as const },
+    messages,
+  };
+  try {
+    return await openai.chat.completions.create({ ...request, temperature: 0.95 });
+  } catch (error) {
+    if (!rejectsTemperature(error)) {
+      throw error;
+    }
+    return openai.chat.completions.create(request);
+  }
+}
+
+function rejectsTemperature(error: unknown): boolean {
+  return error instanceof Error && error.message.toLowerCase().includes("temperature");
 }
 
 function normalizeStory(draft: StoryDraft): StoryDraft {

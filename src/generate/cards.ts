@@ -31,5 +31,5 @@ export function pickParty(ids?: string[]): Adventurer[] {
 }
 
 function resolvePortrait(id: string): string {
-  return `/cards/${id}.png`;
+  return `/cards/${id}.jpg`;
 }

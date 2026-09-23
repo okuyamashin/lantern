@@ -3,7 +3,11 @@ import { getOpenAI } from "./openai.ts";
 import { withEnemySketchStyle, withPortraitStyle, withSceneStyle } from "./style.ts";
 
 export async function generateSceneImageBuffer(prompt: string): Promise<Buffer> {
-  return createImage(withSceneStyle(prompt), "landscape");
+  return createImage(withSceneStyle(prompt), "landscape", "jpeg");
+}
+
+export function isJpeg(buffer: Buffer): boolean {
+  return buffer.length > 2 && buffer[0] === 0xff && buffer[1] === 0xd8;
 }
 
 export async function generateSceneImage(
@@ -13,25 +17,32 @@ export async function generateSceneImage(
   await writeFile(filePath, await generateSceneImageBuffer(prompt));
 }
 
+export async function generatePortraitBuffer(prompt: string): Promise<Buffer> {
+  return createImage(withPortraitStyle(prompt), "portrait", "jpeg");
+}
+
 export async function generatePortraitImage(
   prompt: string,
   filePath: string,
 ): Promise<void> {
-  const buffer = await createImage(withPortraitStyle(prompt), "portrait");
-  await writeFile(filePath, buffer);
+  await writeFile(filePath, await generatePortraitBuffer(prompt));
+}
+
+export async function generateEnemySketchBuffer(prompt: string): Promise<Buffer> {
+  return createImage(withEnemySketchStyle(prompt), "square", "jpeg");
 }
 
 export async function generateEnemySketch(
   prompt: string,
   filePath: string,
 ): Promise<void> {
-  const buffer = await createImage(withEnemySketchStyle(prompt), "square");
-  await writeFile(filePath, buffer);
+  await writeFile(filePath, await generateEnemySketchBuffer(prompt));
 }
 
 async function createImage(
   prompt: string,
   shape: "landscape" | "portrait" | "square",
+  format: "png" | "jpeg" = "png",
 ): Promise<Buffer> {
   const openai = getOpenAI();
 
@@ -40,6 +51,7 @@ async function createImage(
       model: "gpt-image-1",
       prompt,
       size: gptImageSize(shape),
+      ...(format === "jpeg" ? { output_format: "jpeg" as const, quality: "medium" as const } : {}),
     });
     return imageToBuffer(result.data?.[0]);
   } catch {

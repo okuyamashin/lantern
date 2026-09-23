@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: lantern.engawa5656.com static site with SSL and basic auth
+Description: lantern.engawa5656.com static site with SSL
 
 Parameters:
   HostedZoneId:
@@ -8,14 +8,6 @@ Parameters:
   DomainName:
     Type: String
     Default: lantern.engawa5656.com
-  BasicAuthUser:
-    Type: String
-    NoEcho: true
-    Description: HTTP Basic のユーザー。リポジトリには書かない。
-  BasicAuthPassword:
-    Type: String
-    NoEcho: true
-    Description: HTTP Basic のパスワード。リポジトリには書かない。
 
 Resources:
   SiteBucket:
@@ -36,34 +28,6 @@ Resources:
       DomainValidationOptions:
         - DomainName: !Ref DomainName
           HostedZoneId: !Ref HostedZoneId
-
-  BasicAuthFunction:
-    Type: AWS::CloudFront::Function
-    Properties:
-      Name: lantern-basic-auth
-      AutoPublish: true
-      FunctionConfig:
-        Comment: Basic authentication for lantern.engawa5656.com
-        Runtime: cloudfront-js-2.0
-      FunctionCode: !Sub
-        - |
-          function handler(event) {
-            var request = event.request;
-            var header = request.headers.authorization;
-            var expected = "Basic ${AuthToken}";
-            if (!header || header.value !== expected) {
-              return {
-                statusCode: 401,
-                statusDescription: "Unauthorized",
-                headers: {
-                  "www-authenticate": { value: 'Basic realm="lantern"' },
-                },
-              };
-            }
-            return request;
-          }
-        - AuthToken:
-            Fn::Base64: !Sub "${BasicAuthUser}:${BasicAuthPassword}"
 
   OriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
@@ -102,9 +66,6 @@ Resources:
             - HEAD
           Compress: true
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          FunctionAssociations:
-            - EventType: viewer-request
-              FunctionARN: !GetAtt BasicAuthFunction.FunctionARN
         CustomErrorResponses:
           - ErrorCode: 403
             ResponseCode: 200

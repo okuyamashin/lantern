@@ -8,6 +8,11 @@
     "generate:adventure": "tsx scripts/generate-adventure.ts",
     "generate:portraits": "tsx scripts/generate-portraits.ts",
     "generate:enemies": "tsx scripts/generate-enemies.ts",
+    "generate:narration": "tsx scripts/generate-narration.ts",
+    "compress:scenes": "tsx scripts/compress-scenes.ts",
+    "compress:enemies": "tsx scripts/compress-enemies.ts",
+    "compress:cards": "tsx scripts/compress-cards.ts",
+    "suno:bgm": "tsx scripts/suno-bgm.ts",
     "build:aws": "esbuild src/aws/api.ts src/aws/worker.ts --bundle --platform=node --target=node20 --outdir=dist/aws",
     "deploy:lantern": "sh scripts/deploy-lantern.sh",
     "deploy:api": "sh scripts/deploy-api.sh"
@@ -23,6 +28,7 @@
   "devDependencies": {
     "@types/node": "^26.6.2",
     "esbuild": "^0.28.2",
+    "sharp": "^0.35.4",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.0"

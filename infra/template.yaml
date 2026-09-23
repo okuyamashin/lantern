@@ -7,6 +7,19 @@ Parameters:
     Type: String
     NoEcho: true
     Description: OpenAI API key. Do not commit this value.
+  GoogleClientId:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google OAuth web client ID for Cognito.
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google OAuth web client secret for Cognito.
+
+Conditions:
+  HasGoogle: !Not [!Equals [!Ref GoogleClientId, ""]]
 
 Globals:
   Function:
@@ -61,6 +74,82 @@ Resources:
       VisibilityTimeout: 960
       MessageRetentionPeriod: 86400
 
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Condition: HasGoogle
+    Properties:
+      UserPoolName: lantern
+      AutoVerifiedAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+
+  GoogleIdentityProvider:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Condition: HasGoogle
+    Properties:
+      UserPoolId: !Ref UserPool
+      ProviderName: Google
+      ProviderType: Google
+      ProviderDetails:
+        client_id: !Ref GoogleClientId
+        client_secret: !Ref GoogleClientSecret
+        authorize_scopes: openid email profile
+      AttributeMapping:
+        email: email
+        name: name
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Condition: HasGoogle
+    DependsOn: GoogleIdentityProvider
+    Properties:
+      ClientName: lantern-web
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      SupportedIdentityProviders:
+        - Google
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - openid
+        - email
+        - profile
+      CallbackURLs:
+        - https://lantern.engawa5656.com/
+        - https://lantern.engawa5656.com
+        - http://localhost:5173/
+        - http://localhost:5173
+      LogoutURLs:
+        - https://lantern.engawa5656.com/
+        - https://lantern.engawa5656.com
+        - http://localhost:5173/
+        - http://localhost:5173
+      ExplicitAuthFlows:
+        - ALLOW_REFRESH_TOKEN_AUTH
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Condition: HasGoogle
+    Properties:
+      Domain: lantern-engawa5656-868118155022
+      UserPoolId: !Ref UserPool
+
   LanternApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -70,6 +159,7 @@ Resources:
           - http://localhost:5173
         AllowHeaders:
           - content-type
+          - authorization
         AllowMethods:
           - GET
           - POST
@@ -124,3 +214,12 @@ Outputs:
     Value: !Ref JobsQueue
   TableName:
     Value: !Ref JobsTable
+  CognitoDomain:
+    Condition: HasGoogle
+    Value: !Sub "${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com"
+  CognitoClientId:
+    Condition: HasGoogle
+    Value: !Ref UserPoolClient
+  CognitoUserPoolId:
+    Condition: HasGoogle
+    Value: !Ref UserPool

@@ -35,6 +35,38 @@ body {
   text-align: center;
 }
 
+.masthead {
+  position: relative;
+}
+
+.auth-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.auth-who {
+  letter-spacing: 0.04em;
+  font-size: 13px;
+  color: #d4a574;
+}
+
+.auth-button {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
 .eyebrow,
 .role,
 .count {
@@ -148,14 +180,6 @@ button:hover {
   font-size: 13px;
 }
 
-.card .look {
-  margin: 8px 0 0;
-  font-size: 11px;
-  line-height: 1.5;
-  color: #b8a888;
-  word-break: break-word;
-}
-
 .card.is-chosen {
   border-color: #e2c48a;
   box-shadow: 0 0 0 1px #e2c48a inset;
@@ -181,13 +205,32 @@ button:hover {
   cursor: pointer;
 }
 
-.scene-art {
-  display: block;
+.stage-frame {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 16 / 10;
-  object-fit: cover;
   background: #120d0a;
   border: 1px solid #6b5138;
+}
+
+.scene-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #120d0a;
+}
+
+.scene-art.is-back {
+  z-index: 0;
+}
+
+.scene-art.is-front {
+  z-index: 1;
+  box-shadow: -16px 0 24px rgba(0, 0, 0, 0.45);
 }
 
 .caption {

@@ -1,9 +1,11 @@
 import type { Adventure, Adventurer, Enemy, Place, ProgressEvent } from "../types.ts";
 import type { AssetPut } from "../jobs/types.ts";
 import { pickParty } from "./cards.ts";
-import { generateSceneImageBuffer } from "./images.ts";
+import { generateEnemySketchBuffer, generateSceneImageBuffer, isJpeg } from "./images.ts";
+import { generateNarrationBuffer } from "./speech.ts";
+import { inventEnemy, inventPlace } from "./setting.ts";
 import { writeStory } from "./story.ts";
-import { makeSubtitle, pickEnemy, pickPlace } from "./world.ts";
+import { makeSubtitle } from "./world.ts";
 
 export async function generateAdventure(options: {
   id?: string;
@@ -13,10 +15,23 @@ export async function generateAdventure(options: {
 }): Promise<Adventure> {
   const notify = options.onProgress ?? (() => undefined);
   const party = pickParty(options.cardIds);
-  const place = pickPlace();
-  const enemy = pickEnemy();
-  const subtitle = makeSubtitle(party, place, enemy);
   const id = options.id || `${Date.now()}-${party.map((card) => card.id).join("-")}`;
+
+  await notify({ type: "status", message: "場所を考えています" });
+  const place = await inventPlace();
+  await notify({ type: "status", message: "敵を考えています" });
+  const enemy = await inventEnemy();
+  await notify({ type: "status", message: `${enemy.name}のスケッチを描いています` });
+  const sketch = await generateEnemySketchBuffer(
+    `Hand-drawn ink sketch of ${enemy.name}: ${enemy.imageHint}`,
+  );
+  const sketchJpeg = isJpeg(sketch);
+  enemy.imagePath = await options.put(
+    `adventures/${id}/enemy.${sketchJpeg ? "jpg" : "png"}`,
+    sketch,
+    sketchJpeg ? "image/jpeg" : "image/png",
+  );
+  const subtitle = makeSubtitle(party, place, enemy);
 
   await notify({ type: "status", message: `${place.name}で${enemy.name}に向かいます` });
   const draft = await writeStory(party, place, enemy);
@@ -27,14 +42,24 @@ export async function generateAdventure(options: {
       type: "status",
       message: `${index + 1} / ${draft.scenes.length} 枚目の絵を描いています`,
     });
-    const fileName = `scene-${String(index + 1).padStart(2, "0")}.png`;
     const buffer = await generateSceneImageBuffer(withSceneHint(scene.imagePrompt, party, place, enemy));
+    const jpeg = isJpeg(buffer);
+    const fileName = `scene-${String(index + 1).padStart(2, "0")}.${jpeg ? "jpg" : "png"}`;
     const imagePath = await options.put(
       `adventures/${id}/${fileName}`,
       buffer,
-      "image/png",
+      jpeg ? "image/jpeg" : "image/png",
     );
-    scenes.push({ ...scene, imagePath });
+    await notify({
+      type: "status",
+      message: `${index + 1} / ${draft.scenes.length} 枚目を読んでいます`,
+    });
+    const audioPath = await options.put(
+      `adventures/${id}/scene-${String(index + 1).padStart(2, "0")}.mp3`,
+      await generateNarrationBuffer(scene.caption),
+      "audio/mpeg",
+    );
+    scenes.push({ ...scene, imagePath, audioPath });
     await notify({
       type: "scene",
       index: index + 1,

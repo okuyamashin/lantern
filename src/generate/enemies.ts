@@ -1,6 +1,6 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { generateEnemySketch } from "./images.ts";
+import { generateEnemySketchBuffer, isJpeg } from "./images.ts";
 import { listEnemies } from "./world.ts";
 
 export async function generateEnemySketches(
@@ -13,10 +13,11 @@ export async function generateEnemySketches(
 
   for (const [index, enemy] of enemies.entries()) {
     onStatus?.(`${index + 1} / ${enemies.length} ${enemy.name} のスケッチ`);
-    await generateEnemySketch(
+    const buffer = await generateEnemySketchBuffer(
       `Hand-drawn ink sketch of ${enemy.name}: ${enemy.imageHint}`,
-      join(dir, `${enemy.id}.png`),
     );
+    const ext = isJpeg(buffer) ? "jpg" : "png";
+    await writeFile(join(dir, `${enemy.id}.${ext}`), buffer);
     onStatus?.(`${index + 1} / ${enemies.length} ${enemy.name} を書きました`);
   }
 }

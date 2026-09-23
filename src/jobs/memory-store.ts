@@ -1,19 +1,12 @@
-import type { Job, JobStore } from "./types.ts";
+import { makeJob, type Job, type JobStore } from "./types.ts";
 
 const jobs = new Map<string, Job>();
 
 export function createMemoryStore(): JobStore {
   return {
-    async create(cardIds) {
+    async create(draft) {
       const now = new Date().toISOString();
-      const job: Job = {
-        id: `${Date.now()}-${cardIds.join("-") || "random"}`,
-        status: "queued",
-        message: "順番待ちです",
-        cardIds,
-        createdAt: now,
-        updatedAt: now,
-      };
+      const job = makeJob(draft, now);
       jobs.set(job.id, job);
       return job;
     },
