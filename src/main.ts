@@ -313,11 +313,21 @@ function memoLook(id: string): { style: string; paper: number; pin: number } {
   };
 }
 
+const CARD_VIDEOS = new Set(["gald", "bren", "ciel", "hana", "iris", "kira", "luca", "merwin", "nok"]);
+
 function cardView(card: Adventurer, selected: boolean): string {
   const chosen = state.party.some((member) => member.id === card.id);
+  const video = CARD_VIDEOS.has(card.id);
   return `
     <article class="card ${selected || chosen ? "is-chosen" : ""}">
-      <img src="${card.portrait}" alt="${escapeHtml(card.name)}" />
+      <div class="card-frame${video ? " has-video" : ""}" ${video ? `data-action="play-card"` : ""}>
+        <img src="${card.portrait}" alt="${escapeHtml(card.name)}" />
+        ${
+          video
+            ? `<video src="/cards/${card.id}.mp4" playsinline preload="none"></video>`
+            : ""
+        }
+      </div>
       <div class="meta">
         <p class="role">${escapeHtml(card.role)}</p>
         <h3>${escapeHtml(card.name)}</h3>
@@ -334,7 +344,9 @@ function bind(): void {
       if (action !== "next-scene") {
         event.stopPropagation();
       }
-      if (action === "bgm") {
+      if (action === "play-card") {
+        playCard(node);
+      } else if (action === "bgm") {
         toggleBgm();
       } else if (action === "login") {
         useBgm("guild-board");
@@ -373,6 +385,21 @@ function bind(): void {
         void openAdventure(node.dataset.id ?? "");
       }
     });
+  });
+}
+
+function playCard(frame: HTMLElement): void {
+  const video = frame.querySelector("video");
+  if (!video) {
+    return;
+  }
+  frame.classList.add("is-playing");
+  video.currentTime = 0;
+  video.onended = () => {
+    frame.classList.remove("is-playing");
+  };
+  void video.play().catch(() => {
+    frame.classList.remove("is-playing");
   });
 }
 

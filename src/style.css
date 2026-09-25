@@ -158,12 +158,32 @@ button:hover {
   text-align: left;
 }
 
-.card img {
+.card-frame {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: #3a2a1c;
+}
+
+.card-frame.has-video {
+  cursor: pointer;
+}
+
+.card-frame img,
+.card-frame video {
   display: block;
   width: 100%;
-  aspect-ratio: 2 / 3;
+  height: 100%;
   object-fit: cover;
-  background: #3a2a1c;
+}
+
+.card-frame video {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.card-frame.is-playing video {
+  opacity: 1;
 }
 
 .card .meta {
